@@ -1,8 +1,8 @@
-import 'node_modules/@polymer/iron-image/iron-image.js';
+import './node_modules/@polymer/iron-image/iron-image.js';
+import './workers/options.js';
 
 const Jimp = window.Jimp;
-
-const processImage = require('../utils/options');
+const processImage = window.processImage;
 
 const defaultSettings = {
   storage: true,
@@ -18,51 +18,61 @@ const defaultSettings = {
 export default class ProcessImage extends HTMLElement {
 
   constructor() {
-    this.src = '';
-    this.err = '';
-    this.height = null;
-    this.width = null;
+    super();
+    this.settings = {};
 
     this.attachShadow({mode: 'open'});
-    this.shadowRoot.appendChild(document.createElement('iron-image'));
-    this.imageElement = this.shadowRoot.querySelector('iron-image');
+    this.imageElement = document.createElement('iron-image');
+    this.shadowRoot.appendChild(this.imageElement);
   }
 
   async connectedCallback() {
-    // check support for Storage and get a reference to it
-    this._storage = this.checkStorageSupport(this.settings.storage);
-
-    // Check the support for web worker and create a new worker if supported
+    this._storage = this.checkStorageSupport(this._settings.storage);
+    
     if (typeof window.Worker !== 'undefined' && !this.disableWebWorker) {
-      // webworkify-webpack (same bundle on both browser and web worker environment)
-      this.worker = new Worker('worker.js');
-      // this.worker = new NewWorker();
-
-      // Send image filter props to worker
-      this.sendSettingsToWorker();
+      this.worker = new Worker('./workers/worker.js');
+      
+      this.worker.onmessage = e => this.storeImage(e.data.src);
+      this.processor = this.processInWebWorker.bind(this);
+    } else {
+      this.processor = this.processInMainThread.bind(this);
     }
-
-    // Get original size of the image
-    await this.setOriginalImageSize();
-
-    // Process the image in main thread (if no web worker support) or in a web worker
-    this.processInMainThreadOrInWebWorker(this.worker, this.settings);
+    
+    this.settings = JSON.parse(this.getAttribute('settings'));
+    const src = this.getAttribute('src');
+    if (src) {
+      this.src = src;
+    }
   }
 
   attributeChangedCallback(attrName, _oldValue, newValue) {
     if (attrName === 'settings') {
-      this.settings = Object.assign({}, defaultSettings, newValue);
+      this.settings = JSON.parse(newValue);
     } else {
       this[attrName] = newValue;
     }
-    this.render();
   }
 
   disconnectedCallback() {
-    // Terminate worker (though worker is closed after the image processing is done)
     this.worker && this.worker.terminate();
 
     this.clearStorage();
+  }
+
+  get height() {
+    return this._height || 0;
+  }
+
+  get width() {
+    return this._width || 0;
+  }
+
+  set src(v) {
+    this.processor(v);
+  }
+
+  set settings(newSettings) {
+    this._settings = Object.assign({}, defaultSettings, newSettings);
   }
 
   // Check the support for Storage
@@ -76,62 +86,30 @@ export default class ProcessImage extends HTMLElement {
     return null;
   }
 
-  processInMainThreadOrInWebWorker(worker, settings) {
-    if (typeof Worker !== 'undefined' && !settings.disableWebWorker) {
-      return this.processInWebWorker(worker, settings);
-    } else {
-      if (Jimp !== undefined && settings.disableWebWorker) {
-        console.info(webWorkerInfo);
-        return this.processInMainThread(settings);
-      } else {
-        return console.error(noJimpInstance);
-      }
-    }
-  }
-
   // Clear the cache
   clearStorage() {
     this._storage && this._storage.removeItem('placeholder');
   }
 
-  /**
-   * Get the orginal size of the image
-   * @param { object } props image props
-   */
-  async getOriginalImageSize() {
-    const {height, width} = await size(this.image);
-    this.height = height;
-    this.width = width;
+  // Process the image in main thread if no support for web worker
+  async processInMainThread(src) {
+    const image = await Jimp.read(src)
+    processImage(image, props, Jimp).getBase64(Jimp.AUTO, (err, src) => {
+      this.storeImage(src);
+    });
   }
 
-  // Process the image in main thread if no support for web worker
-  async processInMainThread() {
-    const image = await Jimp.read(this.image)
-    processImage(image, props, Jimp).getBase64(Jimp.AUTO, (err, src) => {
-      this.err = err;
-      this.src = src;
-      this.passPropsToParent(props, src, err);
-    });
-  };
+  storeImage(src) {
+    this.imageElement.src = src;
+    const rect = this.getBoundingClientRect();
+    this._height = rect.height;
+    this._width = rect.width;
+    this._storage && this._storage.setItem('placeholder', src);
+  }
 
-  processInWebWorker(worker, settings) {
-    // Get the data from worker
-    if (worker !== null) {
-      worker.onmessage = e => {
-        // Set the processed image
-        this.src = e.data.src;
-        this.err = e.data.err;
-        // Store the image in localStorage (cache is cleared when storage prop is set to false)
-        this._storage && this._storage.setItem('placeholder', e.data.src);
-        this.passPropsToParent(settings, e.data.src, e.data.err);
-      };
-    }
-  };
-
-  /**
-   * Send the image filter settings and image to worker script
-   */
-  sendSettingsToWorker() {
-    this.worker && this.worker.postMessage({ settings: this.settings, image: this.image });
+  processInWebWorker(src) {
+    this.worker.postMessage({ settings: this._settings, src });
   }
 }
+
+customElements.define('process-image', ProcessImage);
