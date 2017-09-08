@@ -4,13 +4,28 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="theme-color" content="#000000">
-    <script src="https://cdn.rawgit.com/oliver-moran/jimp/v0.2.27/browser/lib/jimp.min.js"></script>
+    <script src="workers/node_modules/jimp/browser/lib/jimp.min.js"></script>
     <title>React App</title>
     <script type="module" src='./index.js'></script>
+    <style>
+      body {
+        display: flex;
+        flex-direction: column;
+      }
+      input {
+        max-width: 250px;
+      }
+    </style>
   </head>
   <body>
-    <div id="root"></div>
+    <input id="input" placeholder="Enter different source image url"/>
+    <input id="submit" type="submit" value="Update image!"/>
     <process-image
+        id="image"
+        fade
+        preload
+        sizing="cover"
+        placeholder="http://cumbrianrun.co.uk/wp-content/uploads/2014/02/default-placeholder.png"
         src="https://lh3.ggpht.com/rd52IsX4tX3ManFjv1bTM0eA21CblZ3_1tKul300NHNNqYDoXr-x3qwuiYbF_Ae450RX=h900"
         settings='{
           "resize": {
@@ -27,5 +42,14 @@
           }
         }'
     ></process-image>
+    <script>
+      function update() {
+        image.src = input.value;
+      }
+      submit.addEventListener('click', (e) => {
+        setTimeout(update, 250);
+        clearTimeout(update);
+      })
+    </script>
   </body>
 </html>

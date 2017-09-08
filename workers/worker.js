@@ -6,7 +6,6 @@ self.onmessage = function(e) {
   Jimp.read(e.data.src).then(function(image) {
     processImage(image, e.data.settings, Jimp).getBase64(Jimp.AUTO, function(err, src) {
       self.postMessage({ src, err });
-      self.close();
     });
   });
 };
