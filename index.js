@@ -1,4 +1,4 @@
-import './node_modules/@polymer/iron-image/iron-image.js';
+import './node_modules/iron-image.js';
 import './workers/options.js';
 
 const Jimp = window.Jimp;

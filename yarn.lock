@@ -4,21 +4,25 @@
 
 "@polymer/iron-image@next":
   version "3.0.0-pre.1"
-  resolved "http://35.185.235.147/@polymer%2firon-image/-/iron-image-3.0.0-pre.1.tgz#4c182bd822323c4680d7bc4fbc3a7036b39250c0"
+  resolved "https://registry.yarnpkg.com/@polymer/iron-image/-/iron-image-3.0.0-pre.1.tgz#4c182bd822323c4680d7bc4fbc3a7036b39250c0"
   dependencies:
     "@polymer/polymer" "^3.0.0-pre.1"
 
 "@polymer/polymer@^3.0.0-pre.1":
-  version "3.0.0-pre.5"
-  resolved "http://35.185.235.147/@polymer%2fpolymer/-/polymer-3.0.0-pre.5.tgz#301a1e6ab5f304c5b271ae5018fa2844d8e758f1"
+  version "3.0.0-pre.1"
+  resolved "https://registry.yarnpkg.com/@polymer/polymer/-/polymer-3.0.0-pre.1.tgz#9fc26b5259aad9265f324ced02de715991d2eabe"
   dependencies:
     "@webcomponents/shadycss" "^1.0.0"
     "@webcomponents/webcomponentsjs" "^1.0.0"
 
 "@webcomponents/shadycss@^1.0.0":
   version "1.0.5"
-  resolved "http://35.185.235.147/@webcomponents%2fshadycss/-/shadycss-1.0.5.tgz#ff8537dd06c46f33eccee082cdecd9507bf39f56"
+  resolved "https://registry.yarnpkg.com/@webcomponents/shadycss/-/shadycss-1.0.5.tgz#ff8537dd06c46f33eccee082cdecd9507bf39f56"
 
-"@webcomponents/webcomponentsjs@^1.0.0", "@webcomponents/webcomponentsjs@^1.0.10":
+"@webcomponents/webcomponentsjs@1.0.10", "@webcomponents/webcomponentsjs@^1.0.0", "@webcomponents/webcomponentsjs@^1.0.10":
   version "1.0.10"
-  resolved "http://35.185.235.147/@webcomponents%2fwebcomponentsjs/-/webcomponentsjs-1.0.10.tgz#990da9820a89931c8df285871ec943bf99d4a747"
+  resolved "https://registry.yarnpkg.com/@webcomponents/webcomponentsjs/-/webcomponentsjs-1.0.10.tgz#990da9820a89931c8df285871ec943bf99d4a747"
+
+rollup@^0.49.3:
+  version "0.49.3"
+  resolved "https://registry.yarnpkg.com/rollup/-/rollup-0.49.3.tgz#4cce32643dd8cf2154c69ff0e43470067db0adbf"

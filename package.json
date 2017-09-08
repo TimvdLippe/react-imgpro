@@ -24,13 +24,16 @@
   "license": "MIT",
   "dependencies": {
     "@polymer/iron-image": "next",
-    "@webcomponents/webcomponentsjs": "^1.0.10"
+    "@polymer/polymer": "^3.0.0-pre.1",
+    "@webcomponents/webcomponentsjs": "^1.0.10",
+    "rollup": "^0.49.3"
   },
   "scripts": {
     "start": "NODE_ENV=production ./node_modules/.bin/webpack-dev-server --content-base ./public --config ./webpack.config.dev.js",
-    "postinstall": "cd workers && yarn",
+    "postinstall": "yarn run rollup && cd workers && yarn",
     "prebuild": "rm -rf ./build",
-    "build": "NODE_ENV=production ./node_modules/.bin/webpack --config ./webpack.config.js --progress"
+    "rollup": "rollup node_modules/@polymer/iron-image/iron-image.js --output.format iife --output.file node_modules/iron-image.js",
+    "build": "rollup index.js --name ProcessImage --output.format iife --output.file index.build.js"
   },
   "resolutions": {
     "@webcomponents/webcomponentsjs": "1.0.10"
