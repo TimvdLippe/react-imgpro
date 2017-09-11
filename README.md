@@ -3,6 +3,8 @@
 This repository is the result of an exploration of transforming the React component to process images into a webcomponent.
 All credits for the original idea, API and implementation go to https://github.com/nitin42/react-imgpro
 
+A running example can be found at https://timvdlippe.github.io/react-imgpro/
+
 ## Why?
 
 When I took a first look at the original React implementation, I wondered what React was offering that would be fundamental to writing this component.
