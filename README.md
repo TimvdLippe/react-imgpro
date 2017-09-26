@@ -4,6 +4,7 @@ This repository is the result of an exploration of transforming the React compon
 All credits for the original idea, API and implementation go to https://github.com/nitin42/react-imgpro
 
 A running example can be found at https://timvdlippe.github.io/react-imgpro/
+A full diff can be seen [here](https://github.com/nitin42/react-imgpro/compare/master...TimvdLippe:master)
 
 ## Why?
 
