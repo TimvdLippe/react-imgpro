@@ -1,4 +1,4 @@
-import './node_modules/iron-image.js';
+import './node_modules/@polymer/iron-image/iron-image.js';
 import './workers/options.js';
 
 const Jimp = window.Jimp;
@@ -15,7 +15,13 @@ const defaultSettings = {
   disableWebWorker: false
 };
 
+const ironImageProperties = ['placeholder', 'preload', 'sizing', 'fade'];
+
 export default class ProcessImage extends HTMLElement {
+
+  static get observedAttributes() {
+    return ironImageProperties.concat('src');
+  }
 
   constructor() {
     super();
@@ -31,9 +37,7 @@ export default class ProcessImage extends HTMLElement {
     `
     this.imageElement = document.createElement('iron-image');
     this.shadowRoot.appendChild(this.imageElement);
-  }
 
-  connectedCallback() {
     this._storage = this.checkStorageSupport(this.settings.storage);
     
     if (typeof window.Worker !== 'undefined' && !this.disableWebWorker) {
@@ -47,23 +51,15 @@ export default class ProcessImage extends HTMLElement {
 
     this.settings = JSON.parse(this.getAttribute('settings'));
 
+    for (const field of ironImageProperties) {
+      this.propagateToIronImage(field);
+    }
+  }
+
+  connectedCallback() {
     if (this.settings.resize) {
       this.imageElement.width = this.settings.resize.width;
       this.imageElement.height = this.settings.resize.height;
-    }
-
-    for (const field of ['placeholder', 'preload', 'sizing', 'fade']) {
-      const value = this.getAttribute(field) || this.hasAttribute(field);
-      if (value) {
-        this.propagateToIronImage(field, value);
-      }
-    }
-
-    for (const field of ['src']) {
-      const value = this.getAttribute(field) || this.hasAttribute(field);
-      if (value) {
-        this[field] = value;
-      }
     }
   }
 
@@ -117,7 +113,6 @@ export default class ProcessImage extends HTMLElement {
           this.imageElement[field] = newValue;
         }
       });
-      this[field] = initialValue;
     })();
   }
 

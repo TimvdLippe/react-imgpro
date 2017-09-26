@@ -1,9 +1,6 @@
 var ProcessImage = (function () {
 'use strict';
 
-(function () {
-'use strict';
-
 /**
 @license
 Copyright (c) 2017 The Polymer Project Authors. All rights reserved.
@@ -12035,8 +12032,6 @@ Polymer$1({
   }
 });
 
-}());
-
 // Resize modes
 const RESIZE_MODES = {
   neighbor: 'RESIZE_NEAREST_NEIGHBOR',
@@ -12349,7 +12344,13 @@ const defaultSettings = {
   disableWebWorker: false
 };
 
+const ironImageProperties = ['placeholder', 'preload', 'sizing', 'fade'];
+
 class ProcessImage extends HTMLElement {
+
+  static get observedAttributes() {
+    return ironImageProperties.concat('src');
+  }
 
   constructor() {
     super();
@@ -12365,9 +12366,7 @@ class ProcessImage extends HTMLElement {
     `;
     this.imageElement = document.createElement('iron-image');
     this.shadowRoot.appendChild(this.imageElement);
-  }
 
-  connectedCallback() {
     this._storage = this.checkStorageSupport(this.settings.storage);
     
     if (typeof window.Worker !== 'undefined' && !this.disableWebWorker) {
@@ -12381,23 +12380,15 @@ class ProcessImage extends HTMLElement {
 
     this.settings = JSON.parse(this.getAttribute('settings'));
 
+    for (const field of ironImageProperties) {
+      this.propagateToIronImage(field);
+    }
+  }
+
+  connectedCallback() {
     if (this.settings.resize) {
       this.imageElement.width = this.settings.resize.width;
       this.imageElement.height = this.settings.resize.height;
-    }
-
-    for (const field of ['placeholder', 'preload', 'sizing', 'fade']) {
-      const value = this.getAttribute(field) || this.hasAttribute(field);
-      if (value) {
-        this.propagateToIronImage(field, value);
-      }
-    }
-
-    for (const field of ['src']) {
-      const value = this.getAttribute(field) || this.hasAttribute(field);
-      if (value) {
-        this[field] = value;
-      }
     }
   }
 
@@ -12451,7 +12442,6 @@ class ProcessImage extends HTMLElement {
           this.imageElement[field] = newValue;
         }
       });
-      this[field] = initialValue;
     })();
   }
 
